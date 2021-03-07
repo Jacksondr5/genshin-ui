@@ -1,32 +1,64 @@
-import React from "react";
-import logo from "./logo.svg";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import "./App.css";
 import NewArtifact from "./components/NewArtifact";
-import { Artifact, ArtifactStatType } from "./data/Artifact";
+import { Artifact } from "./data/Artifact";
 import ArtifactDisplay from "./components/ArtifactDisplay";
+import { Grid } from "@material-ui/core";
+
+interface Data {
+  artifacts: Artifact[];
+}
 
 function App() {
-  var artifact: Artifact = {
-    Level: 4,
-    MainStat: { StatName: 2, StatType: ArtifactStatType.MainStat, Value: 5 },
-    Quality: 5,
-    Set: 2,
-    SubStats: [{ StatName: 2, StatType: ArtifactStatType.SubStat, Value: 5 }],
-    Type: 3,
-  };
+  const [data, setData] = useState<Data>({
+    artifacts: [],
+  });
+  const [fetchTrigger, setFetchTrigger] = useState(0);
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await fetch("http://dumb-storage.dev.k8s.j5/genshin");
+      setData(await result.json());
+    };
+
+    fetchData();
+  }, [fetchTrigger]);
+  const nextId = data.artifacts.length + 1;
+
+  const artifactUi = data.artifacts.map((x) => (
+    <Grid item key={x.Id} xs={4}>
+      <ArtifactDisplay artifact={x}></ArtifactDisplay>
+    </Grid>
+  ));
   return (
     <Router>
       <Switch>
         <Route path="/">
-          <NewArtifact onSubmit={onSubmit}></NewArtifact>
-          <ArtifactDisplay artifact={artifact}></ArtifactDisplay>
+          <NewArtifact
+            onSubmit={(x) => onSubmit(x, nextId, data, setFetchTrigger)}
+          ></NewArtifact>
+          <Grid container spacing={2}>
+            {artifactUi}
+          </Grid>
         </Route>
       </Switch>
     </Router>
   );
 }
 
-function onSubmit(newArtifact: Artifact): void {}
+async function onSubmit(
+  newArtifact: Artifact,
+  newId: number,
+  data: Data,
+  triggerFetch: React.Dispatch<React.SetStateAction<number>>
+): Promise<void> {
+  newArtifact.Id = newId;
+  data.artifacts.push(newArtifact);
+  await fetch("http://dumb-storage.dev.k8s.j5/genshin", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  triggerFetch(Math.random());
+}
 
 export default App;

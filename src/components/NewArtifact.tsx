@@ -1,12 +1,5 @@
-import {
-  MenuItem,
-  Button,
-  Select,
-  TextField,
-  FormControl,
-  InputLabel,
-  Grid,
-} from "@material-ui/core";
+import { Button, TextField, Grid } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/lab";
 import React from "react";
 import react, { useState } from "react";
 import {
@@ -15,6 +8,8 @@ import {
   ArtifactStat,
   ArtifactStatType,
   ArtifactTypes,
+  InvalidListableItem,
+  ListableItem,
   MainStatNames,
   SubStatNames,
 } from "../data/Artifact";
@@ -22,29 +17,48 @@ import {
 interface NewArtifactProps {
   onSubmit: (newArtifact: Artifact) => void;
 }
+interface UiArtifactStat {
+  StatType: ArtifactStatType;
+  StatName: number;
+  Value: string;
+}
 
 const NewArtifact: React.FunctionComponent<NewArtifactProps> = (
   props: NewArtifactProps
 ) => {
-  const [artifactType, setArtifactType] = useState("0");
-  const [artifactSet, setArtifactSet] = useState("0");
+  const [artifactType, setArtifactType] = useState(0);
+  const [artifactSet, setArtifactSet] = useState(0);
   const [level, setLevel] = useState("0");
   const [quality, setQuality] = useState("0");
-  const [mainStat, setMainStat] = useState<ArtifactStat>(
+  const [mainStat, setMainStat] = useState<UiArtifactStat>(
     GetArtifactStat(ArtifactStatType.MainStat)
   );
-  const [subStat1, setSubStat1] = useState<ArtifactStat>(
+  const [subStat1, setSubStat1] = useState<UiArtifactStat>(
     GetArtifactStat(ArtifactStatType.SubStat)
   );
-  const [subStat2, setSubStat2] = useState<ArtifactStat>(
+  const [subStat2, setSubStat2] = useState<UiArtifactStat>(
     GetArtifactStat(ArtifactStatType.SubStat)
   );
-  const [subStat3, setSubStat3] = useState<ArtifactStat>(
+  const [subStat3, setSubStat3] = useState<UiArtifactStat>(
     GetArtifactStat(ArtifactStatType.SubStat)
   );
-  const [subStat4, setSubStat4] = useState<ArtifactStat>(
+  const [subStat4, setSubStat4] = useState<UiArtifactStat>(
     GetArtifactStat(ArtifactStatType.SubStat)
   );
+  const newArtifact: Artifact = {
+    Id: 1,
+    Level: Number.parseInt(level),
+    MainStat: ConvertUiArtifactStatToArtifactStat(mainStat),
+    SubStats: [
+      ConvertUiArtifactStatToArtifactStat(subStat1),
+      ConvertUiArtifactStatToArtifactStat(subStat2),
+      ConvertUiArtifactStatToArtifactStat(subStat3),
+      ConvertUiArtifactStatToArtifactStat(subStat4),
+    ],
+    Quality: Number.parseInt(quality),
+    Set: artifactSet,
+    Type: artifactType,
+  };
   return (
     <Grid container spacing={2}>
       {GetSelect("Artifact Type", ArtifactTypes, artifactType, setArtifactType)}
@@ -69,64 +83,91 @@ const NewArtifact: React.FunctionComponent<NewArtifactProps> = (
       {GetStatInput("Sub Stat", SubStatNames, subStat2, setSubStat2)}
       {GetStatInput("Sub Stat", SubStatNames, subStat3, setSubStat3)}
       {GetStatInput("Sub Stat", SubStatNames, subStat4, setSubStat4)}
-      <Button>Submit</Button>
+      <Button
+        variant="outlined"
+        onClick={() => HandleSubmit(props.onSubmit, newArtifact)}
+      >
+        Submit
+      </Button>
     </Grid>
   );
 };
 
-function GetArtifactStat(type: ArtifactStatType): ArtifactStat {
+function HandleSubmit(
+  onSubmit: (newArtifact: Artifact) => void,
+  artifact: Artifact
+) {
+  var workingArtifact = artifact;
+  workingArtifact.SubStats = workingArtifact.SubStats.filter(
+    (x) => x.StatName !== SubStatNames[10].key
+  );
+  onSubmit(workingArtifact);
+}
+
+function ConvertUiArtifactStatToArtifactStat(ui: UiArtifactStat): ArtifactStat {
   return {
-    StatName: 0,
-    StatType: type,
-    Value: 0,
+    StatName: ui.StatName,
+    StatType: ui.StatType,
+    Value: Number.parseFloat(ui.Value),
   };
 }
 
-function GetSelect<T>(
+function GetArtifactStat(type: ArtifactStatType): UiArtifactStat {
+  return {
+    StatName: 0,
+    StatType: type,
+    Value: "0",
+  };
+}
+
+function GetSelect(
   label: string,
-  mappableObject: object,
-  value: T,
-  onChange: (value: React.SetStateAction<T>) => void
+  listableItems: ListableItem[],
+  value: number,
+  onChange: (value: React.SetStateAction<number>) => void
 ) {
+  const thing =
+    listableItems.find((x) => x.key === value) ?? InvalidListableItem;
   return (
     <Grid item xs={3}>
-      <FormControl>
-        <InputLabel>{label}</InputLabel>
-        <Select value={value} onChange={(x) => onChange(x.target.value as T)}>
-          {Object.entries(mappableObject).map((x) => (
-            <MenuItem value={x[0]}>{x[1]}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Autocomplete
+        options={listableItems}
+        getOptionLabel={(x) => x.value}
+        value={thing}
+        renderInput={(params) => (
+          <TextField {...params} label={label} variant="outlined" />
+        )}
+        onChange={(x, newValue) =>
+          onChange(newValue == null ? 0 : newValue.key)
+        }
+      />
     </Grid>
   );
 }
 
 function GetStatInput(
   label: string,
-  mappableObject: object,
-  stat: ArtifactStat,
-  setStat: react.Dispatch<react.SetStateAction<ArtifactStat>>
+  listableItems: ListableItem[],
+  stat: UiArtifactStat,
+  setStat: react.Dispatch<react.SetStateAction<UiArtifactStat>>
 ) {
   return (
     <>
       <Grid item xs={3}>
-        <FormControl>
-          <InputLabel>{label}</InputLabel>
-          <Select
-            value={stat.StatName}
-            onChange={(x) =>
-              setStat({
-                ...stat,
-                StatName: x.target.value as number,
-              })
-            }
-          >
-            {Object.entries(mappableObject).map((x) => (
-              <MenuItem value={x[0]}>{x[1]}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          options={listableItems}
+          getOptionLabel={(x) => x.value}
+          value={listableItems.filter((x) => x.key === stat.StatName)[0]}
+          renderInput={(params) => (
+            <TextField {...params} label={label} variant="outlined" />
+          )}
+          onChange={(x, newValue) =>
+            setStat({
+              ...stat,
+              StatName: newValue == null ? 0 : newValue.key,
+            })
+          }
+        />
       </Grid>
       <Grid item xs={3}>
         <TextField
@@ -135,7 +176,7 @@ function GetStatInput(
           onChange={(x) =>
             setStat({
               ...stat,
-              Value: Number.parseInt(x.target.value),
+              Value: x.target.value,
             })
           }
         ></TextField>
