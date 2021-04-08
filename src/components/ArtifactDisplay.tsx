@@ -27,9 +27,9 @@ const ArtifactDisplay: React.FunctionComponent<ArtifactDisplayProps> = (
 ) => {
   const artifact = props.artifact;
   const set =
-    ArtifactSets.find((x) => x.key === artifact.Set) ?? InvalidListableItem;
+    ArtifactSets.find((x) => x.key === artifact.set) ?? InvalidListableItem;
   const type =
-    ArtifactTypes.find((x) => x.key === artifact.Type) ?? InvalidListableItem;
+    ArtifactTypes.find((x) => x.key === artifact.type) ?? InvalidListableItem;
   return (
     <Card>
       <CardContent>
@@ -41,16 +41,16 @@ const ArtifactDisplay: React.FunctionComponent<ArtifactDisplayProps> = (
             <Typography variant="h5">{type.value}</Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography variant="h5">{artifact.Id}</Typography>
+            <Typography variant="h5">{artifact.id}</Typography>
           </Grid>
           <Grid item xs={4}>
-            <Typography variant="h6">Level: {artifact.Level}</Typography>
+            <Typography variant="h6">Level: {artifact.level}</Typography>
           </Grid>
           <Grid item xs={4}>
-            <Rating value={artifact.Quality} readOnly />
+            <Rating value={artifact.quality} readOnly />
           </Grid>
-          {GetStatDisplay(MainStatNames, artifact.MainStat, 4)}
-          {artifact.SubStats.map((x) => GetStatDisplay(SubStatNames, x, 6))}
+          {GetStatDisplay(MainStatNames, artifact.mainStat, 4)}
+          {artifact.subStats.map((x) => GetStatDisplay(SubStatNames, x, 6))}
         </Grid>
       </CardContent>
     </Card>
@@ -63,10 +63,10 @@ function GetStatDisplay(
   size: GridSize
 ) {
   const type =
-    statTypes.find((x) => x.key === stat.StatName) ?? InvalidListableItem;
+    statTypes.find((x) => x.key === stat.statName) ?? InvalidListableItem;
   return (
-    <Grid item key={stat.StatName} xs={size}>
-      {type.value}: {stat.Value}
+    <Grid item key={stat.statName} xs={size}>
+      {type.value}: {stat.value}
     </Grid>
   );
 }

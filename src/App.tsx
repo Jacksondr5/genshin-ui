@@ -1,45 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import "./App.css";
 import NewArtifact from "./components/NewArtifact";
 import { Artifact } from "./data/Artifact";
-import ArtifactDisplay from "./components/ArtifactDisplay";
-import { Grid } from "@material-ui/core";
-
-interface Data {
-  artifacts: Artifact[];
-}
+import { AppBar, Button, Grid } from "@material-ui/core";
+import ArtifactList from "./components/ArtifactList";
 
 function App() {
-  const [data, setData] = useState<Data>({
-    artifacts: [],
-  });
+  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [fetchTrigger, setFetchTrigger] = useState(0);
   useEffect(() => {
     const fetchData = async () => {
-      const result = await fetch("http://dumb-storage.dev.k8s.j5/genshin");
-      setData(await result.json());
+      const result = await fetch("http://genshin-api.dev.k8s.j5/artifact");
+      setArtifacts(await result.json());
     };
 
     fetchData();
   }, [fetchTrigger]);
-  const nextId = data.artifacts.length + 1;
 
-  const artifactUi = data.artifacts.map((x) => (
-    <Grid item key={x.Id} xs={4}>
-      <ArtifactDisplay artifact={x}></ArtifactDisplay>
-    </Grid>
-  ));
   return (
     <Router>
-      <Switch>
-        <Route path="/">
-          <NewArtifact
-            onSubmit={(x) => onSubmit(x, nextId, data, setFetchTrigger)}
-          ></NewArtifact>
-          <Grid container spacing={2}>
-            {artifactUi}
+      <AppBar position="sticky">
+        <Grid container spacing={2} justify="space-around">
+          <Grid item xs={6}>
+            <Button>
+              <Link to="/artifact-list">Artifact List</Link>
+            </Button>
           </Grid>
+          <Grid item xs={6}>
+            <Button>
+              <Link to="/new-artifact">New Artifact</Link>
+            </Button>
+          </Grid>
+        </Grid>
+      </AppBar>
+      <Switch>
+        <Route path="/new-artifact">
+          <NewArtifact
+            onSubmit={(x) => onSubmit(x, artifacts, setFetchTrigger)}
+          ></NewArtifact>
+        </Route>
+        <Route path="/artifact-list">
+          <ArtifactList artifacts={artifacts} />
         </Route>
       </Switch>
     </Router>
@@ -48,16 +50,15 @@ function App() {
 
 async function onSubmit(
   newArtifact: Artifact,
-  newId: number,
-  data: Data,
+  artifacts: Artifact[],
   triggerFetch: React.Dispatch<React.SetStateAction<number>>
 ): Promise<void> {
-  newArtifact.Id = newId;
-  data.artifacts.push(newArtifact);
-  await fetch("http://dumb-storage.dev.k8s.j5/genshin", {
+  var response = await fetch("http://genshin-api.dev.k8s.j5/artifact", {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(newArtifact),
   });
+  var artifact = await response.json();
+  artifacts.push(artifact);
   triggerFetch(Math.random());
 }
 

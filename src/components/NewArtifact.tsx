@@ -1,4 +1,4 @@
-import { Button, TextField, Grid } from "@material-ui/core";
+import { Button, TextField, Grid, GridSize } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import React from "react";
 import react, { useState } from "react";
@@ -28,8 +28,8 @@ const NewArtifact: React.FunctionComponent<NewArtifactProps> = (
 ) => {
   const [artifactType, setArtifactType] = useState(0);
   const [artifactSet, setArtifactSet] = useState(0);
-  const [level, setLevel] = useState("0");
-  const [quality, setQuality] = useState("0");
+  const [level, setLevel] = useState(0);
+  const [quality, setQuality] = useState(0);
   const [mainStat, setMainStat] = useState<UiArtifactStat>(
     GetArtifactStat(ArtifactStatType.MainStat)
   );
@@ -46,37 +46,31 @@ const NewArtifact: React.FunctionComponent<NewArtifactProps> = (
     GetArtifactStat(ArtifactStatType.SubStat)
   );
   const newArtifact: Artifact = {
-    Id: 1,
-    Level: Number.parseInt(level),
-    MainStat: ConvertUiArtifactStatToArtifactStat(mainStat),
-    SubStats: [
+    id: 1,
+    level: level,
+    mainStat: ConvertUiArtifactStatToArtifactStat(mainStat),
+    subStats: [
       ConvertUiArtifactStatToArtifactStat(subStat1),
       ConvertUiArtifactStatToArtifactStat(subStat2),
       ConvertUiArtifactStatToArtifactStat(subStat3),
       ConvertUiArtifactStatToArtifactStat(subStat4),
     ],
-    Quality: Number.parseInt(quality),
-    Set: artifactSet,
-    Type: artifactType,
+    quality: quality,
+    set: artifactSet,
+    type: artifactType,
   };
   return (
     <Grid container spacing={2}>
-      {GetSelect("Artifact Type", ArtifactTypes, artifactType, setArtifactType)}
-      {GetSelect("Artifact Set", ArtifactSets, artifactSet, setArtifactSet)}
-      <Grid item xs={3}>
-        <TextField
-          label="Level"
-          value={level}
-          onChange={(x) => setLevel(x.target.value)}
-        ></TextField>
-      </Grid>
-      <Grid item xs={3}>
-        <TextField
-          label="Quality"
-          value={quality}
-          onChange={(x) => setQuality(x.target.value)}
-        ></TextField>
-      </Grid>
+      {GetSelect(
+        3,
+        "Artifact Type",
+        ArtifactTypes,
+        artifactType,
+        setArtifactType
+      )}
+      {GetSelect(3, "Artifact Set", ArtifactSets, artifactSet, setArtifactSet)}
+      {GetTextInput(3, "Level", level, setLevel)}
+      {GetTextInput(3, "Quality", quality, setQuality)}
 
       {GetStatInput("Main Stat", MainStatNames, mainStat, setMainStat)}
       {GetStatInput("Sub Stat", SubStatNames, subStat1, setSubStat1)}
@@ -98,17 +92,17 @@ function HandleSubmit(
   artifact: Artifact
 ) {
   var workingArtifact = artifact;
-  workingArtifact.SubStats = workingArtifact.SubStats.filter(
-    (x) => x.StatName !== SubStatNames[10].key
+  workingArtifact.subStats = workingArtifact.subStats.filter(
+    (x) => x.statName !== SubStatNames[10].key
   );
   onSubmit(workingArtifact);
 }
 
 function ConvertUiArtifactStatToArtifactStat(ui: UiArtifactStat): ArtifactStat {
   return {
-    StatName: ui.StatName,
-    StatType: ui.StatType,
-    Value: Number.parseFloat(ui.Value),
+    statName: ui.StatName,
+    statType: ui.StatType,
+    value: Number.parseFloat(ui.Value),
   };
 }
 
@@ -120,7 +114,8 @@ function GetArtifactStat(type: ArtifactStatType): UiArtifactStat {
   };
 }
 
-function GetSelect(
+export function GetSelect(
+  size: GridSize,
   label: string,
   listableItems: ListableItem[],
   value: number,
@@ -129,7 +124,7 @@ function GetSelect(
   const thing =
     listableItems.find((x) => x.key === value) ?? InvalidListableItem;
   return (
-    <Grid item xs={3}>
+    <Grid item xs={size}>
       <Autocomplete
         options={listableItems}
         getOptionLabel={(x) => x.value}
@@ -141,6 +136,27 @@ function GetSelect(
           onChange(newValue == null ? 0 : newValue.key)
         }
       />
+    </Grid>
+  );
+}
+
+export function GetTextInput(
+  size: GridSize,
+  label: string,
+  value: number,
+  onChange: (value: React.SetStateAction<number>) => void
+) {
+  return (
+    <Grid item xs={size}>
+      <TextField
+        label={label}
+        value={value}
+        onChange={(x) => {
+          const value = Number.parseInt(x.target.value);
+          if (Number.isNaN(value)) onChange(0);
+          onChange(value);
+        }}
+      ></TextField>
     </Grid>
   );
 }

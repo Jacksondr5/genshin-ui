@@ -84,17 +84,17 @@ export enum ArtifactStatType {
 }
 
 export interface ArtifactStat {
-  StatType: ArtifactStatType;
-  StatName: number;
-  Value: number;
+  statName: number;
+  statType: ArtifactStatType;
+  value: number;
 }
 
 export interface Artifact {
-  Id: number;
-  Type: number;
-  Set: number;
-  Level: number;
-  Quality: number;
-  MainStat: ArtifactStat;
-  SubStats: ArtifactStat[];
+  id: number;
+  level: number;
+  mainStat: ArtifactStat;
+  quality: number;
+  set: number;
+  subStats: ArtifactStat[];
+  type: number;
 }
