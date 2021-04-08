@@ -11,13 +11,15 @@ pool:
 
 steps:
   - task: NodeTool@0
+    displayName: "Install Node.js"
     inputs:
       versionSpec: "14.x"
-    displayName: "Install Node.js"
   - task: Npm@1
+    displayName: npm ci
     inputs:
       command: "ci"
   - task: Npm@1
+    displayName: npm build
     inputs:
       command: "custom"
       customCommand: "run-script build"
