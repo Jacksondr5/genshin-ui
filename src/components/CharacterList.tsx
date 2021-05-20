@@ -11,7 +11,7 @@ export interface CharacterListProps {
 
 const CharacterList = (props: CharacterListProps) => {
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [fetchTrigger, setFetchTrigger] = useState(0);
+  const [fetchTrigger] = useState(0);
   useEffect(() => {
     const fetchData = async () => {
       const result = await fetch("http://genshin-api.dev.k8s.j5/character");
