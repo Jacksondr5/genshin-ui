@@ -7,6 +7,15 @@ export const InvalidListableItem: ListableItem = {
   value: "INVALID DATA",
 };
 
+export enum ArtifactType {
+  Circlet = 4,
+  Clock = 3,
+  Cup = 2,
+  Feather = 1,
+  Flower = 0,
+  Nothing = -1,
+}
+
 export const ArtifactTypes: ListableItem[] = [
   { key: 0, value: "Flower" },
   { key: 1, value: "Feather" },

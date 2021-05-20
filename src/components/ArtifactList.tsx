@@ -10,10 +10,13 @@ import {
   SubStatNames,
 } from "../data/Artifact";
 import ArtifactDisplay from "./ArtifactDisplay";
-import { GetSelect, GetTextInput } from "./NewArtifact";
+import { GridTextInputNumber } from "./GridTextInput";
+import { GetSelect } from "./NewArtifact";
 
 export interface ArtifactListProps {
   artifacts: Artifact[];
+  typeFilter?: number;
+  onSelect?: (artifactId: number) => void;
 }
 const allListableItem: ListableItem = {
   key: -1,
@@ -21,7 +24,7 @@ const allListableItem: ListableItem = {
 };
 
 const ArtifactList: React.FunctionComponent<ArtifactListProps> = (props) => {
-  const [type, setType] = useState(allListableItem.key);
+  const [type, setType] = useState(props.typeFilter ?? allListableItem.key);
   const [set, setSet] = useState(allListableItem.key);
   const [quality, setQuality] = useState(allListableItem.key);
   const [mainStat, setMainStat] = useState(allListableItem);
@@ -60,7 +63,12 @@ const ArtifactList: React.FunctionComponent<ArtifactListProps> = (props) => {
           set,
           setSet
         )}
-        {GetTextInput(1, "Quality", quality, setQuality)}
+        <GridTextInputNumber
+          size={1}
+          label="Quality"
+          value={quality}
+          onChange={setQuality}
+        />
         {GetAutoComplete(
           2,
           "Main Stat",

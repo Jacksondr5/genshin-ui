@@ -13,6 +13,7 @@ import {
   MainStatNames,
   SubStatNames,
 } from "../data/Artifact";
+import { GridTextInputNumber } from "./GridTextInput";
 
 interface NewArtifactProps {
   onSubmit: (newArtifact: Artifact) => void;
@@ -31,19 +32,19 @@ const NewArtifact: React.FunctionComponent<NewArtifactProps> = (
   const [level, setLevel] = useState(0);
   const [quality, setQuality] = useState(0);
   const [mainStat, setMainStat] = useState<UiArtifactStat>(
-    GetArtifactStat(ArtifactStatType.MainStat)
+    GetInitialArtifactStat(ArtifactStatType.MainStat)
   );
   const [subStat1, setSubStat1] = useState<UiArtifactStat>(
-    GetArtifactStat(ArtifactStatType.SubStat)
+    GetInitialArtifactStat(ArtifactStatType.SubStat)
   );
   const [subStat2, setSubStat2] = useState<UiArtifactStat>(
-    GetArtifactStat(ArtifactStatType.SubStat)
+    GetInitialArtifactStat(ArtifactStatType.SubStat)
   );
   const [subStat3, setSubStat3] = useState<UiArtifactStat>(
-    GetArtifactStat(ArtifactStatType.SubStat)
+    GetInitialArtifactStat(ArtifactStatType.SubStat)
   );
   const [subStat4, setSubStat4] = useState<UiArtifactStat>(
-    GetArtifactStat(ArtifactStatType.SubStat)
+    GetInitialArtifactStat(ArtifactStatType.SubStat)
   );
   const newArtifact: Artifact = {
     id: 1,
@@ -69,8 +70,18 @@ const NewArtifact: React.FunctionComponent<NewArtifactProps> = (
         setArtifactType
       )}
       {GetSelect(3, "Artifact Set", ArtifactSets, artifactSet, setArtifactSet)}
-      {GetTextInput(3, "Level", level, setLevel)}
-      {GetTextInput(3, "Quality", quality, setQuality)}
+      <GridTextInputNumber
+        size={3}
+        label="Level"
+        value={level}
+        onChange={setLevel}
+      />
+      <GridTextInputNumber
+        size={3}
+        label="Quality"
+        value={quality}
+        onChange={setQuality}
+      />
 
       {GetStatInput("Main Stat", MainStatNames, mainStat, setMainStat)}
       {GetStatInput("Sub Stat", SubStatNames, subStat1, setSubStat1)}
@@ -106,7 +117,7 @@ function ConvertUiArtifactStatToArtifactStat(ui: UiArtifactStat): ArtifactStat {
   };
 }
 
-function GetArtifactStat(type: ArtifactStatType): UiArtifactStat {
+function GetInitialArtifactStat(type: ArtifactStatType): UiArtifactStat {
   return {
     StatName: 0,
     StatType: type,
@@ -136,27 +147,6 @@ export function GetSelect(
           onChange(newValue == null ? 0 : newValue.key)
         }
       />
-    </Grid>
-  );
-}
-
-export function GetTextInput(
-  size: GridSize,
-  label: string,
-  value: number,
-  onChange: (value: React.SetStateAction<number>) => void
-) {
-  return (
-    <Grid item xs={size}>
-      <TextField
-        label={label}
-        value={value}
-        onChange={(x) => {
-          const value = Number.parseInt(x.target.value);
-          if (Number.isNaN(value)) onChange(0);
-          onChange(value);
-        }}
-      ></TextField>
     </Grid>
   );
 }

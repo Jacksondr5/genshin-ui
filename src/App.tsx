@@ -5,6 +5,7 @@ import NewArtifact from "./components/NewArtifact";
 import { Artifact } from "./data/Artifact";
 import { AppBar, Button, Grid } from "@material-ui/core";
 import ArtifactList from "./components/ArtifactList";
+import CharacterList from "./components/CharacterList";
 
 function App() {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
@@ -22,16 +23,10 @@ function App() {
     <Router>
       <AppBar position="sticky">
         <Grid container spacing={2} justify="space-around">
-          <Grid item xs={6}>
-            <Button>
-              <Link to="/artifact-list">Artifact List</Link>
-            </Button>
-          </Grid>
-          <Grid item xs={6}>
-            <Button>
-              <Link to="/new-artifact">New Artifact</Link>
-            </Button>
-          </Grid>
+          <GridLink route="/artifact-list" title="Artifact List" />
+          <GridLink route="/new-artifact" title="New Artifact" />
+          <GridLink route="/character-list" title="Character List" />
+          {/* <GridLink route="/new-loadout" title="New Loadout" /> */}
         </Grid>
       </AppBar>
       <Switch>
@@ -43,8 +38,24 @@ function App() {
         <Route path="/artifact-list">
           <ArtifactList artifacts={artifacts} />
         </Route>
+        <Route path="/new-loadout">
+          <div></div>
+        </Route>
+        <Route path="/character-list">
+          <CharacterList artifacts={artifacts} />
+        </Route>
       </Switch>
     </Router>
+  );
+}
+
+function GridLink(props: { route: string; title: string }) {
+  return (
+    <Grid item xs={3}>
+      <Button>
+        <Link to={props.route}>{props.title}</Link>
+      </Button>
+    </Grid>
   );
 }
 

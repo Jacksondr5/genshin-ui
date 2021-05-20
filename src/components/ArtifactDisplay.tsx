@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CardContent,
   Grid,
@@ -20,6 +21,7 @@ import {
 
 interface ArtifactDisplayProps {
   artifact: Artifact;
+  onSelect?: (artifactId: number) => void;
 }
 
 const ArtifactDisplay: React.FunctionComponent<ArtifactDisplayProps> = (
@@ -30,6 +32,12 @@ const ArtifactDisplay: React.FunctionComponent<ArtifactDisplayProps> = (
     ArtifactSets.find((x) => x.key === artifact.set) ?? InvalidListableItem;
   const type =
     ArtifactTypes.find((x) => x.key === artifact.type) ?? InvalidListableItem;
+  var selectButton =
+    props.onSelect == undefined ? (
+      <></>
+    ) : (
+      <Button onClick={() => props.onSelect!(artifact.id)}>Select</Button>
+    );
   return (
     <Card>
       <CardContent>
@@ -37,11 +45,14 @@ const ArtifactDisplay: React.FunctionComponent<ArtifactDisplayProps> = (
           <Grid item xs={6}>
             <Typography variant="h5">{set.value}</Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             <Typography variant="h5">{type.value}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={1}>
             <Typography variant="h5">{artifact.id}</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            {selectButton}
           </Grid>
           <Grid item xs={4}>
             <Typography variant="h6">Level: {artifact.level}</Typography>
