@@ -1,5 +1,5 @@
 import { Card, CardContent, Grid, Typography } from "@material-ui/core";
-import React, { useState } from "react";
+import React from "react";
 import { Artifact } from "../data/Artifact";
 import { Loadout } from "../data/Character";
 import ArtifactDisplay from "./ArtifactDisplay";
@@ -18,7 +18,7 @@ const LoadoutDisplay = (props: LoadoutDisplayProps) => {
     props.loadout.circletId,
   ]
     .map((x) => props.artifacts.find((y) => y.id === x))
-    .filter((x) => x != undefined)
+    .filter((x) => x !== undefined)
     .map((x) => (
       <Grid key={x!.id} item xs={2}>
         <ArtifactDisplay artifact={x!} />

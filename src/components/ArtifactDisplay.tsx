@@ -33,7 +33,7 @@ const ArtifactDisplay: React.FunctionComponent<ArtifactDisplayProps> = (
   const type =
     ArtifactTypes.find((x) => x.key === artifact.type) ?? InvalidListableItem;
   var selectButton =
-    props.onSelect == undefined ? (
+    props.onSelect === undefined ? (
       <></>
     ) : (
       <Button onClick={() => props.onSelect!(artifact.id)}>Select</Button>
